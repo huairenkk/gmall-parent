@@ -51,8 +51,8 @@ public class SpuManageController {
      */
     //admin/product/saveSpuInfo
     @PostMapping("/saveSpuInfo")
-    public Result saveSpuInfo() {
-
+    public Result saveSpuInfo(@RequestBody SpuInfo spuInfo) {
+        manageService.saveSpuInfo(spuInfo);
         return Result.ok();
     }
 }

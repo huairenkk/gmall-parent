@@ -7,12 +7,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mysql.cj.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,6 +30,22 @@ public class ManageServiceImpl implements ManageService {
     private SpuInfoMapper spuInfoMapper;
     @Autowired
     private BaseSaleAttrMapper baseSaleAttrMapper;
+    @Autowired
+    private SpuImageMapper spuImageMapper;
+    @Autowired
+    private SpuPosterMapper spuPosterMapper;
+    @Autowired
+    private SpuSaleAttrMapper spuSaleAttrMapper;
+    @Autowired
+    private SpuSaleAttrValueMapper spuSaleAttrValueMapper;
+    @Autowired
+    private SkuInfoMapper skuInfoMapper;
+    @Autowired
+    private SkuSaleAttrValueMapper skuSaleAttrValueMapper;
+    @Autowired
+    private SkuAttrValueMapper skuAttrValueMapper;
+    @Autowired
+    private SkuImageMapper skuImageMapper;
 
     /**
      * 获取一级分类列表
@@ -132,8 +147,8 @@ public class ManageServiceImpl implements ManageService {
     /**
      * //admin/product/{page}/{limit}
      * //spu分页列表
-     * @param page
-     * @param limit
+     * @param
+     * @param
      * @return
      */
     @Override
@@ -149,5 +164,133 @@ public class ManageServiceImpl implements ManageService {
     public List<BaseSaleAttr> getBaseSaleAttrList() {
         return baseSaleAttrMapper.selectList(null);
 
+    }
+
+    /**
+     *
+     * 保存spu
+     * spu_info *
+     * spu_poster *
+     * spu_image *
+     * spu_sale_attr_value
+     * spu_sale_attr
+     *
+     * @param spuInfo
+     */
+    @Override
+    public void saveSpuInfo(SpuInfo spuInfo) {
+        spuInfoMapper.insert(spuInfo);
+        Long spuId = spuInfo.getId();
+        //spuImage
+        List<SpuImage> imageList = spuInfo.getSpuImageList();
+        if (!CollectionUtils.isEmpty(imageList)) {
+            for (SpuImage spuImage : imageList) {
+                spuImage.setSpuId(spuId);
+                spuImageMapper.insert(spuImage);
+            }
+        }
+        //SpuPoster
+        List<SpuPoster> posterList = spuInfo.getSpuPosterList();
+        if (!CollectionUtils.isEmpty(posterList)) {
+            for (SpuPoster spuPoster : posterList) {
+                spuPoster.setSpuId(spuId);
+                spuPosterMapper.insert(spuPoster);
+            }
+        }
+        //SpuSaleAttr
+        List<SpuSaleAttr> spuSaleAttrList = spuInfo.getSpuSaleAttrList();
+        if (!CollectionUtils.isEmpty(spuSaleAttrList)) {
+            for (SpuSaleAttr spuSaleAttr : spuSaleAttrList) {
+                spuSaleAttr.setSpuId(spuId);
+                String saleAttrName = spuSaleAttr.getSaleAttrName();
+                spuSaleAttrMapper.insert(spuSaleAttr);
+                List<SpuSaleAttrValue> spuSaleAttrValueList = spuSaleAttr.getSpuSaleAttrValueList();
+                for (SpuSaleAttrValue spuSaleAttrValue : spuSaleAttrValueList) {
+                    spuSaleAttrValue.setSaleAttrName(saleAttrName);
+                    spuSaleAttrValue.setSpuId(spuId);
+                    spuSaleAttrValueMapper.insert(spuSaleAttrValue);
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public List<SpuSaleAttr> getSpuSaleAttrList(Long spuId) {
+        List<SpuSaleAttr> spuSaleAttrList = spuSaleAttrMapper.getSpuSaleAttrList(spuId);
+        return spuSaleAttrList;
+    }
+
+    @Override
+    public List<SpuImage> getSpuImageList(Long spuId) {
+        QueryWrapper<SpuImage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("spu_id",spuId);
+        List<SpuImage> spuImageList = spuImageMapper.selectList(queryWrapper);
+        return spuImageList;
+    }
+
+    /**
+     *
+     * sku_ingo
+     * sku_image
+     * sku_sale_attr_value
+     * sku_attr_value
+     *
+     * @param skuInfo
+     */
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void saveSkuInfo(SkuInfo skuInfo) {
+        skuInfoMapper.insert(skuInfo);
+        Long skuId = skuInfo.getId();
+        //sku图片
+        List<SkuImage> skuImageList = skuInfo.getSkuImageList();
+        if (!CollectionUtils.isEmpty(skuImageList)) {
+            for (SkuImage skuImage : skuImageList) {
+                skuImage.setSkuId(skuId);
+                skuImageMapper.insert(skuImage);
+            }
+        }
+        //销售属性
+        List<SkuSaleAttrValue> skuSaleAttrValueList = skuInfo.getSkuSaleAttrValueList();
+        if (!CollectionUtils.isEmpty(skuSaleAttrValueList)) {
+            for (SkuSaleAttrValue skuSaleAttrValue : skuSaleAttrValueList) {
+                skuSaleAttrValue.setSkuId(skuId);
+                skuSaleAttrValue.setSpuId(skuInfo.getSpuId());
+                skuSaleAttrValueMapper.insert(skuSaleAttrValue);
+            }
+        }
+        //平台属性
+        List<SkuAttrValue> skuAttrValueList = skuInfo.getSkuAttrValueList();
+        if (!CollectionUtils.isEmpty(skuAttrValueList)) {
+            for (SkuAttrValue skuAttrValue : skuAttrValueList) {
+                skuAttrValue.setSkuId(skuId);
+                skuAttrValueMapper.insert(skuAttrValue);
+            }
+        }
+    }
+
+    @Override
+    public IPage<SkuInfo> getSkuList(Page<SkuInfo> skuInfoPage) {
+        QueryWrapper<SkuInfo> queryWrapper = new QueryWrapper<>();
+        queryWrapper.orderByDesc("id");
+        return skuInfoMapper.selectPage(skuInfoPage,queryWrapper);
+    }
+
+    @Override
+    public void onSale(Long skuId) {
+        SkuInfo skuInfo = new SkuInfo();
+        skuInfo.setId(skuId);
+        skuInfo.setIsSale(1);
+        skuInfoMapper.updateById(skuInfo);
+    }
+
+    @Override
+    public void cancelSale(Long skuId) {
+        SkuInfo skuInfo = new SkuInfo();
+        skuInfo.setId(skuId);
+        skuInfo.setIsSale(0);
+        skuInfoMapper.updateById(skuInfo);
     }
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--namespace 定义接口的全路径-->
+<mapper namespace="com.atguigu.gmall.product.mapper.SpuSaleAttrMapper">
+    <resultMap id="spuSaleAttrMap" type="com.atguigu.gmall.model.product.SpuSaleAttr" autoMapping="true">
+        <!--id:表示主键 property：表示实体类的属性名 column：表示通过sql 执行以后查询出来的字段名-->
+        <id property="id" column="id"/>
+        <!-- 对多映射 -->
+        <collection property="spuSaleAttrValueList" ofType="com.atguigu.gmall.model.product.SpuSaleAttrValue"
+                    autoMapping="true">
+            <!-- 给重复的属性起别名 -->
+            <id property="id" column="sale_attr_value_id"/>
+        </collection>
+    </resultMap>
+    <sql id="spuSaleAttr">
+        ssa.id ,ssa.spu_id, ssa.sale_attr_name,ssa.base_sale_attr_id,
+            ssav.id sale_attr_value_id,
+            ssav.sale_attr_value_name
+
+    </sql>
+    <select id="getSpuSaleAttrList" resultMap="spuSaleAttrMap">
+        select <include refid="spuSaleAttr"/>
+        from spu_sale_attr ssa
+                 inner join spu_sale_attr_value ssav
+                            on ssa.base_sale_attr_id = ssav.base_sale_attr_id and ssav.spu_id = ssa.spu_id
+        where ssa.spu_id = #{spu_id};
+    </select>
+</mapper>
