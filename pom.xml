@@ -8,6 +8,7 @@
         <module>gmall-common</module>
         <module>gmall-model</module>
         <module>gmall-service</module>
+        <module>server-gateway</module>
     </modules>
 
     <!--    引入springboot父工程-->

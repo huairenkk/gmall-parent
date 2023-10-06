@@ -3,14 +3,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>gmall-common</artifactId>
+        <artifactId>gmall-parent</artifactId>
         <groupId>com.atguigu.gmall</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>service-util</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>server-gateway</artifactId>
 
     <dependencies>
         <dependency>
@@ -19,31 +18,24 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
-        <!-- redis -->
+        <!-- 服务注册 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!-- 服务配置-->
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
         </dependency>
 
-        <!-- spring2.X集成redis所需common-pool2-->
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-pool2</artifactId>
-        </dependency>
-
-        <!-- redisson 分布式锁-->
-        <dependency>
-            <groupId>org.redisson</groupId>
-            <artifactId>redisson</artifactId>
-        </dependency>
-
-        <!--mybatis-plus-->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-            <scope>provided</scope>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
 
     </dependencies>
+
 
 </project>

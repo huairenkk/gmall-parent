@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--namespace 定义接口的全路径-->
+<mapper namespace="com.atguigu.gmall.product.mapper.BaseAttrInfoMapper">
+    <!--
+        resultMap：表示返回的映射结果集
+        id ： 表示唯一标识
+        type：表示返回结果集的数据类型
+        autoMapping : 自动映射
+    -->
+    <resultMap id="baseAttrInfoMap" type="com.atguigu.gmall.model.product.BaseAttrInfo" autoMapping="true">
+        <!--id:表示主键 property：表示实体类的属性名 column：表示通过sql 执行以后查询出来的字段名-->
+        <id property="id" column="id"/>
+        <!-- 对多映射 -->
+        <collection property="attrValueList" ofType="com.atguigu.gmall.model.product.BaseAttrValue" autoMapping="true">
+            <!-- 给重复的属性起别名 -->
+            <id property="id" column="attr_value_id"/>
+        </collection>
+    </resultMap>
+    <!-- id表示方法名 -->
+    <select id="selectBaseAttrInfoList" resultMap="baseAttrInfoMap">
+        select bai.id,
+        bai.attr_name,
+        bai.update_time,
+        bai.create_time,
+        bai.category_id,
+        bai.category_level,
+        bav.id attr_value_id,
+        bav.create_time,
+        bav.update_time,
+        bav.attr_id,
+        bav.value_name
+        from base_attr_info bai
+        inner join base_attr_value bav
+        on bai.id = bav.attr_id
+        <where>
+            <trim prefix="(" suffix=")">
+                <if test="category1Id!=null and category1Id!=0">
+                    bai.category_id = #{category1Id} and bai.category_level = 1
+                </if>
+                <if test="category2Id!=null and category2Id!=0">
+                    or bai.category_id = #{category2Id} and bai.category_level = 2
+                </if>
+                <if test="category2Id!=null and category2Id!=0">
+                    or bai.category_id = #{category3Id} and bai.category_level = 3
+                </if>
+            </trim>
+            and bai.is_deleted=0 and bav.is_deleted=0
+            order by bai.category_level asc, bai.category_id asc;
+        </where>
+    </select>
+</mapper>

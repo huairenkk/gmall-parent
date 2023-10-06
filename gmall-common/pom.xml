@@ -29,16 +29,24 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
-        <!--swagger-->
+        <!--整合knife4j-->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi2-spring-boot-starter</artifactId>
+            <version>4.0.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-        </dependency>
+        <!--swagger-->
+<!--        <dependency>-->
+<!--            <groupId>io.springfox</groupId>-->
+<!--            <artifactId>springfox-swagger2</artifactId>-->
+<!--        </dependency>-->
+
+
+<!--        <dependency>-->
+<!--            <groupId>io.springfox</groupId>-->
+<!--            <artifactId>springfox-swagger-ui</artifactId>-->
+<!--        </dependency>-->
         <!--用来转换json使用 {JavaObject - json | json - JavaObject}-->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -51,6 +59,8 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
             <scope>provided </scope>
         </dependency>
+
+
 
 
     </dependencies>
