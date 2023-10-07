@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -46,6 +48,9 @@ public class ManageServiceImpl implements ManageService {
     private SkuAttrValueMapper skuAttrValueMapper;
     @Autowired
     private SkuImageMapper skuImageMapper;
+    @Autowired
+    private BaseCategoryViewMapper baseCategoryViewMapper;
+
 
     /**
      * 获取一级分类列表
@@ -113,7 +118,7 @@ public class ManageServiceImpl implements ManageService {
     public void saveAttrInfo(BaseAttrInfo baseAttrInfo) {
         //判断id是否存在
         Long id = baseAttrInfo.getId();
-        if (id!=null) {
+        if (id != null) {
             //修改平台属性值
             baseAttrInfoMapper.updateById(baseAttrInfo);
         } else {
@@ -125,7 +130,7 @@ public class ManageServiceImpl implements ManageService {
         // 修改：通过先删除{baseAttrValue}，再新增的方式！
         List<BaseAttrValue> valueList = baseAttrInfo.getAttrValueList();
         QueryWrapper queryWrapper = new QueryWrapper<BaseAttrValue>();
-        queryWrapper.eq("attr_id",baseAttrInfo.getId());
+        queryWrapper.eq("attr_id", baseAttrInfo.getId());
         baseAttrValueMapper.delete(queryWrapper);
         //保存BaseAttrValue
         if (!CollectionUtils.isEmpty(valueList)) {
@@ -140,13 +145,15 @@ public class ManageServiceImpl implements ManageService {
     @Override
     public List<BaseAttrValue> getAttrValueList(Long attrId) {
         LambdaQueryWrapper<BaseAttrValue> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(BaseAttrValue::getAttrId,attrId);
+        queryWrapper.eq(BaseAttrValue::getAttrId, attrId);
         List<BaseAttrValue> valueList = baseAttrValueMapper.selectList(queryWrapper);
         return valueList;
     }
+
     /**
      * //admin/product/{page}/{limit}
      * //spu分页列表
+     *
      * @param
      * @param
      * @return
@@ -154,7 +161,7 @@ public class ManageServiceImpl implements ManageService {
     @Override
     public IPage<SpuInfo> getSpuInfoPage(Page<SpuInfo> spuInfoPage, Long category3Id) {
         LambdaQueryWrapper<SpuInfo> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(SpuInfo::getCategory3Id,category3Id);
+        queryWrapper.eq(SpuInfo::getCategory3Id, category3Id);
         queryWrapper.orderByDesc(SpuInfo::getId);
         Page<SpuInfo> spuInfoPageList = spuInfoMapper.selectPage(spuInfoPage, queryWrapper);
         return spuInfoPageList;
@@ -167,7 +174,6 @@ public class ManageServiceImpl implements ManageService {
     }
 
     /**
-     *
      * 保存spu
      * spu_info *
      * spu_poster *
@@ -224,13 +230,12 @@ public class ManageServiceImpl implements ManageService {
     @Override
     public List<SpuImage> getSpuImageList(Long spuId) {
         QueryWrapper<SpuImage> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("spu_id",spuId);
+        queryWrapper.eq("spu_id", spuId);
         List<SpuImage> spuImageList = spuImageMapper.selectList(queryWrapper);
         return spuImageList;
     }
 
     /**
-     *
      * sku_ingo
      * sku_image
      * sku_sale_attr_value
@@ -275,7 +280,7 @@ public class ManageServiceImpl implements ManageService {
     public IPage<SkuInfo> getSkuList(Page<SkuInfo> skuInfoPage) {
         QueryWrapper<SkuInfo> queryWrapper = new QueryWrapper<>();
         queryWrapper.orderByDesc("id");
-        return skuInfoMapper.selectPage(skuInfoPage,queryWrapper);
+        return skuInfoMapper.selectPage(skuInfoPage, queryWrapper);
     }
 
     @Override
@@ -292,5 +297,46 @@ public class ManageServiceImpl implements ManageService {
         skuInfo.setId(skuId);
         skuInfo.setIsSale(0);
         skuInfoMapper.updateById(skuInfo);
+    }
+
+    @Override
+    public SkuInfo getSkuInfo(Long skuId) {
+        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+        QueryWrapper<SkuImage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("sku_id", skuId);
+        List<SkuImage> skuImageList = skuImageMapper.selectList(queryWrapper);
+        if (!CollectionUtils.isEmpty(skuImageList)) {
+            skuInfo.setSkuImageList(skuImageList);
+        }
+        return skuInfo;
+    }
+
+    @Override
+    public BaseCategoryView getCategoryView(Long category3Id) {
+        return baseCategoryViewMapper.selectById(category3Id);
+    }
+
+    @Override
+    //不要去调用之前的方法，之前的数据放在缓存，而价格数据放在硬盘
+    public BigDecimal getSkuPrice(Long skuId) {
+        SkuInfo skuInfo = skuInfoMapper.selectById(skuId);
+        if (null != skuInfo) {
+            return skuInfo.getPrice();
+        }
+        return new BigDecimal("0");
+
+    }
+
+    @Override
+    public List<SpuPoster> findSpuPosterBySpuId(Long spuId) {
+        QueryWrapper<SpuPoster> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("spu_id",spuId);
+        List<SpuPoster> spuPosterList = spuPosterMapper.selectList(queryWrapper);
+        return spuPosterList;
+    }
+
+    @Override
+    public List<SpuSaleAttr> getSpuSaleAttrListCheckBySku(Long skuId, Long spuId) {
+        return spuSaleAttrMapper.selectSpuSaleAttrListCheckBySku(skuId,spuId);
     }
 }

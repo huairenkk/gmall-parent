@@ -4,6 +4,7 @@ import com.atguigu.gmall.model.product.*;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ManageService {
@@ -64,4 +65,14 @@ public interface ManageService {
     void onSale(Long skuId);
 
     void cancelSale(Long skuId);
+
+    SkuInfo getSkuInfo(Long skuId);
+
+    BaseCategoryView getCategoryView(Long category3Id);
+
+    BigDecimal getSkuPrice(Long skuId);
+
+    List<SpuPoster> findSpuPosterBySpuId(Long spuId);
+
+    List<SpuSaleAttr> getSpuSaleAttrListCheckBySku(Long skuId, Long spuId);
 }
