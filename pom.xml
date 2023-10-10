@@ -9,6 +9,8 @@
         <module>gmall-model</module>
         <module>gmall-service</module>
         <module>server-gateway</module>
+        <module>service-client</module>
+        <module>gmall-web</module>
     </modules>
 
     <!--    引入springboot父工程-->

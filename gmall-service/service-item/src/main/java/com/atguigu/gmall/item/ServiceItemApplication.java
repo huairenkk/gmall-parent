@@ -9,9 +9,9 @@ import org.springframework.context.annotation.ComponentScan;
 
 //取消数据源自动配置
 @SpringBootApplication(exclude = DataSourceAutoConfiguration.class)
-@ComponentScan({"com.atguigu.gmall"})
+@ComponentScan(basePackages = "com.atguigu.gmall")
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.atguigu.gmall")
 public class ServiceItemApplication {
     public static void main(String[] args) {
         SpringApplication.run(ServiceItemApplication.class,args);

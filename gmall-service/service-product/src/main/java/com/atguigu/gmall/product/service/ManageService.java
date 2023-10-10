@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 public interface ManageService {
     /**
@@ -75,4 +76,8 @@ public interface ManageService {
     List<SpuPoster> findSpuPosterBySpuId(Long spuId);
 
     List<SpuSaleAttr> getSpuSaleAttrListCheckBySku(Long skuId, Long spuId);
+
+    Map getSkuValueIdsMap(Long spuId);
+
+    List<BaseAttrInfo> getAttrList(Long skuId);
 }

@@ -6,11 +6,14 @@ package com.atguigu.gmall.common.constant;
  */
 public class RedisConst {
 
+
     public static final String SKUKEY_PREFIX = "sku:";
     public static final String SKUKEY_SUFFIX = ":info";
     //单位：秒
     public static final long SKUKEY_TIMEOUT = 24 * 60 * 60;
     // 定义变量，记录空对象的缓存过期时间
+    // 商品如果在数据库中不存在那么会缓存一个空对象进去，但是这个对象是没有用的，所以这个对象的过期时间应该不能太长，
+    // 如果太长会占用内存。
     public static final long SKUKEY_TEMPORARY_TIMEOUT = 10 * 60;
 
     //单位：秒 尝试获取锁的最大等待时间
